@@ -112,14 +112,9 @@ public class Assembler {
                     }
 
                     // sets the machine code field by field
-                    // add OPCODE
-                    mcode |= (opcode << 28);
-
-                    // add R1
-                    mcode |= (field1 << 23);
-
-                    // add R2
-                    mcode |= (field2 << 18);
+                    mcode |= (opcode << 28); // add OPCODE
+                    mcode |= (field1 << 23); // add R1
+                    mcode |= (field2 << 18); // add R2
 
                     // add R3 or SHAMT
                     if (ins.equals("SLL") || ins.equals("SRL")) {
@@ -148,17 +143,10 @@ public class Assembler {
                     field3 = aFileScanner.nextInt();
 
                     // sets the machine code field by field
-                    // add OPCODE
-                    mcode |= (opcode << 28);
-
-                    // add R1
-                    mcode |= (field1 << 23);
-
-                    // add R2
-                    mcode |= (field2 << 18);
-
-                    // add IMM
-                    mcode |= field3;
+                    mcode |= (opcode << 28); // add OPCODE
+                    mcode |= (field1 << 23); // add R1
+                    mcode |= (field2 << 18); // add R2
+                    mcode |= field3; // add IMM
 
                     break;
                 }
@@ -168,11 +156,8 @@ public class Assembler {
                     int field1 = aFileScanner.nextInt();
 
                     // sets the machine code field by field
-                    // add OPCODE
-                    mcode |= (opcode << 28);
-
-                    // add ADDRESS
-                    mcode |= field1;
+                    mcode |= (opcode << 28); // add OPCODE
+                    mcode |= field1; // add ADDRESS
 
                     break;
                 }
