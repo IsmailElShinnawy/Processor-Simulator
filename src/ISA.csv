@@ -1,0 +1,13 @@
+instruction,type,opcode
+ADD,R,0
+SUB,R,1
+MULI,I,2
+ADDI,I,3
+BNE,I,4
+ANDI,I,5
+ORI,I,6
+J,J,7
+SLL,R,8
+SRL,R,9
+LW,I,10
+SW,I,11
