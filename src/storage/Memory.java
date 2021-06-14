@@ -5,7 +5,7 @@ public class Memory {
     private int iSize;
 
     public Memory(int piSize) {
-
+        aiMem = new int [piSize];
     }
 
     public void setWord(int piAddress, int piWord) {
