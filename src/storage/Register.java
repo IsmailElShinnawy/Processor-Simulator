@@ -5,16 +5,18 @@ public class Register {
     private String strName;
 
     public int getValue() {
-        return 0;
+        return iValue;
     }
 
     public void setValue(int piValue) {
+        iValue=piValue;
     }
 
     public String getName() {
-        return null;
+        return strName;
     }
 
     public void setName(String pStrName) {
+        strName = pStrName;
     }
 }
