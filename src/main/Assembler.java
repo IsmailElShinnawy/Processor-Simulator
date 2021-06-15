@@ -182,7 +182,7 @@ public class Assembler {
      * @param x
      * @return
      */
-    private String convertToBinary32(int x) {
+    private static String convertToBinary32(int x) {
         String res = "";
         for (int i = 0; i < 32; ++i) {
             res = (((x >> i) & 1) == 1 ? 1 : 0) + res;
