@@ -9,20 +9,20 @@ public abstract class Stage {
     private PipelineRegisterFile nextPipelineRegisterFile;
 
     public Stage(Simulator pSimSimulator) {
-
+         simSimulator = pSimSimulator;
     }
 
     public abstract void execute();
 
     public Simulator getSimulator() {
-        return null;
+        return simSimulator;
     }
 
     public void setPrevPipelineRegisterFile(PipelineRegisterFile pPrevPipelineRegisterFile) {
-
+        prevPipelineRegisterFile = pPrevPipelineRegisterFile;
     }
 
     public void setNextPipelineRegisterFile(PipelineRegisterFile pNextPipelineRegisterFile) {
-
+        nextPipelineRegisterFile = pNextPipelineRegisterFile;
     }
 }
