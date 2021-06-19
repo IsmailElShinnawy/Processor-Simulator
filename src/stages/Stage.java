@@ -1,5 +1,8 @@
 package stages;
 
+import exceptions.RegisterNotFoundException;
+import exceptions.ZeroRegisterException;
+import exceptions.pcSetException;
 import main.Simulator;
 import storage.PipelineRegisterFile;
 
@@ -12,7 +15,7 @@ public abstract class Stage {
          simSimulator = pSimSimulator;
     }
 
-    public abstract void execute();
+    public abstract void execute() throws RegisterNotFoundException, ZeroRegisterException, pcSetException;
 
     public Simulator getSimulator() {
         return simSimulator;
@@ -24,5 +27,13 @@ public abstract class Stage {
 
     public void setNextPipelineRegisterFile(PipelineRegisterFile pNextPipelineRegisterFile) {
         nextPipelineRegisterFile = pNextPipelineRegisterFile;
+    }
+
+    public PipelineRegisterFile getPrevPipelineRegisterFile (){
+        return prevPipelineRegisterFile;
+    }
+
+    public PipelineRegisterFile getNextPipelineRegisterFile (){
+        return nextPipelineRegisterFile;
     }
 }
