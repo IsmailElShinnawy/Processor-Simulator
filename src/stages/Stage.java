@@ -1,8 +1,7 @@
 package stages;
 
-import exceptions.RegisterNotFoundException;
-import exceptions.ZeroRegisterException;
-import exceptions.pcSetException;
+
+import exceptions.StorageException;
 import main.Simulator;
 import storage.PipelineRegisterFile;
 
@@ -15,7 +14,7 @@ public abstract class Stage {
          simSimulator = pSimSimulator;
     }
 
-    public abstract void execute() throws RegisterNotFoundException, ZeroRegisterException, pcSetException;
+    public abstract void execute() throws StorageException;
 
     public Simulator getSimulator() {
         return simSimulator;

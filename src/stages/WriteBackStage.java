@@ -1,8 +1,6 @@
 package stages;
 
-import exceptions.RegisterNotFoundException;
-import exceptions.ZeroRegisterException;
-import exceptions.pcSetException;
+import exceptions.StorageException;
 import main.Simulator;
 
 public class WriteBackStage extends Stage {
@@ -12,7 +10,7 @@ public class WriteBackStage extends Stage {
     }
 
     @Override
-    public void execute() throws RegisterNotFoundException, ZeroRegisterException, pcSetException {
+    public void execute() throws StorageException {
         if(this.getPrevPipelineRegisterFile().get("wb").getValue()==1){
             int writeBackRegisterAddress = this.getPrevPipelineRegisterFile().get("wbReg").getValue();
             int dataToBeWritten=0;

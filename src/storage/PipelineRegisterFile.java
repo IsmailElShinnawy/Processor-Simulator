@@ -2,7 +2,7 @@ package storage;
 
 import java.util.Hashtable;
 
-import exceptions.RegisterNotFoundException;
+import exceptions.StorageException;
 
 public class PipelineRegisterFile {
     private Hashtable<String, Register> htblNameRegister;
@@ -22,12 +22,12 @@ public class PipelineRegisterFile {
         }
     }
 
-    public Register get(String pStrRegisterName) throws RegisterNotFoundException {
+    public Register get(String pStrRegisterName) throws StorageException {
         if(htblNameRegister.containsKey(pStrRegisterName)){
             return htblNameRegister.get(pStrRegisterName);
         }
         else{
-            throw new RegisterNotFoundException("The register you're trying to access does not exit");
+            throw new StorageException("The register you're trying to access does not exit");
         }
     }
 

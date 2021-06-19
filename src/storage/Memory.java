@@ -1,7 +1,6 @@
 package storage;
 
-import exceptions.MemoryReadException;
-import exceptions.MemoryWriteException;
+import exceptions.StorageException;
 
 public class Memory {
     private int aiMem[];
@@ -12,21 +11,21 @@ public class Memory {
         iSize = piSize;
     }
 
-    public void setWord(int piAddress, int piWord) throws MemoryWriteException {
+    public void setWord(int piAddress, int piWord) throws StorageException {
         if(piAddress<iSize && piAddress>=0){
             aiMem[piAddress]=piWord;
         }
         else{
-            throw new MemoryWriteException("The memory location you're trying to access does not exist");
+            throw new StorageException("The memory location you're trying to access does not exist");
         }
     }
 
-    public int getWord(int piAddress) throws MemoryReadException {
+    public int getWord(int piAddress) throws StorageException {
         if(piAddress<iSize && piAddress>=0){
             return aiMem[piAddress];
         }
         else{
-            throw new MemoryReadException("The memory location you're trying to access does not exist");
+            throw new StorageException("The memory location you're trying to access does not exist");
         }
     }
 }
