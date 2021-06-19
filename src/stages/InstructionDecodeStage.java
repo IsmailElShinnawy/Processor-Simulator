@@ -42,6 +42,8 @@ public class InstructionDecodeStage extends Stage {
 
 		// incrementing the PC by one
 		getSimulator().getRegisterFile().setPCValue(getSimulator().getRegisterFile().getPCValue() + 1);
+
+		this.getNextPipelineRegisterFile().put("pc", getSimulator().getRegisterFile().getPCValue());
 	}
 
 }
