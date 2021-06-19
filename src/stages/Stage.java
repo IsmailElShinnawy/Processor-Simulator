@@ -12,7 +12,7 @@ public abstract class Stage {
     private PipelineRegisterFile nextPipelineRegisterFile;
 
     public Stage(Simulator pSimSimulator) {
-         simSimulator = pSimSimulator;
+        simSimulator = pSimSimulator;
     }
 
     public abstract void execute() throws RegisterNotFoundException, ZeroRegisterException, pcSetException;
@@ -29,11 +29,11 @@ public abstract class Stage {
         nextPipelineRegisterFile = pNextPipelineRegisterFile;
     }
 
-    public PipelineRegisterFile getPrevPipelineRegisterFile (){
+    public PipelineRegisterFile getPrevPipelineRegisterFile() {
         return prevPipelineRegisterFile;
     }
 
-    public PipelineRegisterFile getNextPipelineRegisterFile (){
+    public PipelineRegisterFile getNextPipelineRegisterFile() {
         return nextPipelineRegisterFile;
     }
 }
