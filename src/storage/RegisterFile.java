@@ -18,6 +18,7 @@ public class RegisterFile {
             }
             aRegRegisters[i]=new Register(regName);
         }
+        aRegRegisters[PC] = new Register("PC");
     }
 
     public int getRegisterValue(int piRegisterAddress) throws StorageException {
@@ -51,7 +52,7 @@ public class RegisterFile {
         return aRegRegisters[PC].getValue();
     }
 
-    public void setPCValue(int piValue)  {
+    public void setPCValue(int piValue) {
         aRegRegisters[PC].setValue(piValue);
     }
 }

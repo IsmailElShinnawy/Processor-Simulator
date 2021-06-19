@@ -7,7 +7,7 @@ public class Memory {
     private int iSize;
 
     public Memory(int piSize) {
-        aiMem = new int [piSize];
+        aiMem = new int[piSize];
         iSize = piSize;
     }
 
