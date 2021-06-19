@@ -25,4 +25,12 @@ public abstract class Stage {
     public void setNextPipelineRegisterFile(PipelineRegisterFile pNextPipelineRegisterFile) {
 
     }
+
+    public PipelineRegisterFile getNextPipelineRegisterFile() {
+        return nextPipelineRegisterFile;
+    }
+
+    public PipelineRegisterFile getPrevPipelineRegisterFile() {
+        return prevPipelineRegisterFile;
+    }
 }
