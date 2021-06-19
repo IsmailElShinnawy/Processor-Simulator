@@ -4,17 +4,24 @@ public class Register {
     private int iValue;
     private String strName;
 
+    public Register(String pstrName) {
+        strName = pstrName;
+        iValue = 0;
+    }
+
     public int getValue() {
-        return 0;
+        return iValue;
     }
 
     public void setValue(int piValue) {
+        iValue = piValue;
     }
 
     public String getName() {
-        return null;
+        return strName;
     }
 
     public void setName(String pStrName) {
+        strName = pStrName;
     }
 }

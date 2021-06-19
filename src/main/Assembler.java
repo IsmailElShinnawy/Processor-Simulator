@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Hashtable;
 
 import exceptions.AssemblerException;
+import exceptions.MemoryWriteException;
 import util.Scanner;
 
 public class Assembler {
@@ -73,11 +74,13 @@ public class Assembler {
      * equivalent machine code, also it stores the instructions in the simulators
      * memory
      * 
-     * @throws IOException        when IO fails
-     * @throws AssemblerException when syntax errors occur in the program file such
-     *                            as unsupported instruction and unknown registers
+     * @throws IOException          when IO fails
+     * @throws AssemblerException   when syntax errors occur in the program file
+     *                              such as unsupported instruction and unknown
+     *                              registers
+     * @throws MemoryWriteException
      */
-    public void assemble() throws IOException, AssemblerException {
+    public void assemble() throws IOException, AssemblerException, MemoryWriteException {
         System.out.println("ASSEMBLING FILE...");
         // counter used to keep track of the instructions number and used in memory
         // addressing
@@ -190,7 +193,7 @@ public class Assembler {
         return res;
     }
 
-    public static void main(String[] args) throws IOException, AssemblerException {
+    public static void main(String[] args) throws IOException, AssemblerException, MemoryWriteException {
         Assembler a = new Assembler("src/program", null);
         a.assemble();
     }
