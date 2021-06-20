@@ -15,7 +15,7 @@ public class Simulator {
 
     private Memory memMemory;
     private RegisterFile rfileRegFile;
-    private int iClkCycles;
+    private int iTotalClkCycles;
     private Hashtable<Integer, String> htblOPCodeInstruction;
 
     private InstructionFetchStage ifStage;
@@ -61,37 +61,44 @@ public class Simulator {
     }
 
     public void start() {
-        System.out.println("Welcome to MacNeumann");
-        iClkCycles = 1;
-        boolean fd = false;
-        boolean fe = false;
-        while (true) {
-            if (iClkCycles%2!=0){
+        System.out.println("--------------------------Welcome to MacNeumann--------------------------");
+        int currentClkCycle = 1;
+        boolean fd = false, fe = false;
+        while (currentClkCycle <= iTotalClkCycles) {
+            if (currentClkCycle % 2 != 0)
                 ifStage.execute();
-                if(fd == false){idStage.execute();}
-                if(fe == false){iexStage.execute();}
-                wbStage.execute();
-                fd = false;
-                fe = false;
+            if (currentClkCycle > 1) {
+                if (!fd) {
+                    idStage.execute();
+                }
+                fd = !fd;
             }
-            else{
-                idStage.execute();
-                iexStage.execute();
+            if (currentClkCycle > 3) {
+                if (!fe) {
+                    ifStage.execute();
+                }
+                fd = !fe;
+            }
+            if (currentClkCycle > 5 && currentClkCycle % 2 == 0) {
                 maStage.execute();
-                fd = true;
-                fe = true;
             }
-            System.out.println("Cycle"+iClkCycles);
-            System.out.println();
-            iClkCycles++;
+            if (currentClkCycle > 6 && currentClkCycle % 2 != 0) {
+                wbStage.execute();
+            }
+            ++currentClkCycle;
         }
     }
+
     public RegisterFile getRegisterFile() {
         return rfileRegFile;
     }
 
     public Memory getMemory() {
         return memMemory;
+    }
+
+    public void setTotalClkCycles(int piNumberOfInstruction) {
+        iTotalClkCycles = 7 + ((piNumberOfInstruction - 1) * 2);
     }
 
 }
