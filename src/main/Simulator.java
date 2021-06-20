@@ -30,17 +30,68 @@ public class Simulator {
     private PipelineRegisterFile MAtoWBPipelineRegisterFile;
 
     public Simulator(int piInstructionMemorySize, int piDataMemorySize) {
+        // Initialising Memory
+        memMemory = new Memory(piInstructionMemorySize + piDataMemorySize);
+        // Initialising Stages
+        ifStage = new InstructionFetchStage(this);
+        idStage = new InstructionDecodeStage(this);
+        iexStage = new InstructionExecuteStage(this);
+        maStage = new MemoryAccessStage(this);
+        wbStage = new WriteBackStage(this);
+        // Initalising Pipeline Register files
+        IFtoIDPipelineRegisterFile = new PipelineRegisterFile();
+        IDtoIEXPipelineRegisterFile = new PipelineRegisterFile();
+        IEXtoMAPipelineRegisterFile = new PipelineRegisterFile();
+        MAtoWBPipelineRegisterFile = new PipelineRegisterFile();
+        // Connections
+        ifStage.setPrevPipelineRegisterFile(null);
+        ifStage.setNextPipelineRegisterFile(IFtoIDPipelineRegisterFile);
+
+        idStage.setPrevPipelineRegisterFile(IFtoIDPipelineRegisterFile);
+        idStage.setNextPipelineRegisterFile(IDtoIEXPipelineRegisterFile);
+
+        iexStage.setPrevPipelineRegisterFile(IDtoIEXPipelineRegisterFile);
+        iexStage.setNextPipelineRegisterFile(IEXtoMAPipelineRegisterFile);
+
+        maStage.setNextPipelineRegisterFile(IEXtoMAPipelineRegisterFile);
+        maStage.setNextPipelineRegisterFile(MAtoWBPipelineRegisterFile);
+
+        wbStage.setPrevPipelineRegisterFile(MAtoWBPipelineRegisterFile);
+        wbStage.setNextPipelineRegisterFile(null);
     }
 
     public void start() {
+        System.out.println("Welcome to MacNeumann");
+        iClkCycles = 1;
+        boolean fd = false;
+        boolean fe = false;
+        while (true) {
+            if (iClkCycles%2!=0){
+                ifStage.execute();
+                if(fd == false){idStage.execute();}
+                if(fe == false){iexStage.execute();}
+                wbStage.execute();
+                fd = false;
+                fe = false;
+            }
+            else{
+                idStage.execute();
+                iexStage.execute();
+                maStage.execute();
+                fd = true;
+                fe = true;
+            }
+            System.out.println("Cycle"+iClkCycles);
+            System.out.println();
+            iClkCycles++;
+        }
     }
-
     public RegisterFile getRegisterFile() {
-        return null;
+        return rfileRegFile;
     }
 
     public Memory getMemory() {
-        return null;
+        return memMemory;
     }
 
 }
