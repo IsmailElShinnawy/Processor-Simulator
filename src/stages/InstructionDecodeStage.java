@@ -1,5 +1,7 @@
 package stages;
 
+import exceptions.RegisterNotFoundException;
+import exceptions.pcGetException;
 import main.Simulator;
 
 public class InstructionDecodeStage extends Stage {
@@ -12,7 +14,7 @@ public class InstructionDecodeStage extends Stage {
 	}
 
 	@Override
-	public void execute() {
+	public void execute() throws RegisterNotFoundException, pcGetException {
 		// getting instruction from the prev pipleline register file
 		int instruction = getPrevPipelineRegisterFile().get("ir").getValue();
 

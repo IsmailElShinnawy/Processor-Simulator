@@ -1,5 +1,6 @@
 package stages;
 
+import exceptions.RegisterNotFoundException;
 import main.Simulator;
 
 public class InstructionExecuteStage extends Stage {
@@ -9,7 +10,7 @@ public class InstructionExecuteStage extends Stage {
 	}
 
 	@Override
-	public void execute() {
+	public void execute() throws RegisterNotFoundException {
 		int opcode = this.getPrevPipelineRegisterFile().get("opcode").getValue();
 		int rsValue = this.getPrevPipelineRegisterFile().get("rsValue").getValue();
 		int rtValue = this.getPrevPipelineRegisterFile().get("rtValue").getValue();
