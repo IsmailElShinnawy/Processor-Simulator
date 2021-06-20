@@ -1,6 +1,7 @@
 package stages;
 
 import exceptions.MemoryReadException;
+import exceptions.MemoryWriteException;
 import exceptions.RegisterNotFoundException;
 import exceptions.ZeroRegisterException;
 import exceptions.pcGetException;
@@ -18,7 +19,7 @@ public abstract class Stage {
     }
 
     public abstract void execute() throws RegisterNotFoundException, ZeroRegisterException, pcSetException,
-            pcGetException, MemoryReadException;
+            pcGetException, MemoryReadException, MemoryWriteException;
 
     public Simulator getSimulator() {
         return simSimulator;
@@ -37,14 +38,6 @@ public abstract class Stage {
     }
 
     public PipelineRegisterFile getNextPipelineRegisterFile() {
-        return nextPipelineRegisterFile;
-    }
-
-    public PipelineRegisterFile getPrevPipelineRegisterFile(){
-        return prevPipelineRegisterFile;
-    }
-
-    public PipelineRegisterFile getNextPipelineRegisterFile(){
         return nextPipelineRegisterFile;
     }
 }

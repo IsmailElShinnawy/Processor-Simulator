@@ -1,5 +1,8 @@
 package stages;
 
+import exceptions.MemoryReadException;
+import exceptions.MemoryWriteException;
+import exceptions.RegisterNotFoundException;
 import main.Simulator;
 
 public class MemoryAccessStage extends Stage {
@@ -10,7 +13,7 @@ public class MemoryAccessStage extends Stage {
     }
 
     @Override
-    public void execute() {
+    public void execute() throws RegisterNotFoundException, MemoryWriteException, MemoryReadException {
         int ac = this.getPrevPipelineRegisterFile().get("ac").getValue();
         int MAR = this.getPrevPipelineRegisterFile().get("MAR").getValue();
         int memRead = this.getPrevPipelineRegisterFile().get("memoryRead").getValue();

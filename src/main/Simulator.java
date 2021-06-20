@@ -2,6 +2,12 @@ package main;
 
 import java.util.Hashtable;
 
+import exceptions.MemoryReadException;
+import exceptions.MemoryWriteException;
+import exceptions.RegisterNotFoundException;
+import exceptions.ZeroRegisterException;
+import exceptions.pcGetException;
+import exceptions.pcSetException;
 import stages.InstructionExecuteStage;
 import stages.InstructionFetchStage;
 import stages.MemoryAccessStage;
@@ -60,7 +66,8 @@ public class Simulator {
         wbStage.setNextPipelineRegisterFile(null);
     }
 
-    public void start() {
+    public void start() throws MemoryReadException, RegisterNotFoundException, pcGetException, ZeroRegisterException,
+            pcSetException, MemoryWriteException {
         System.out.println("--------------------------Welcome to MacNeumann--------------------------");
         int currentClkCycle = 1;
         boolean fd = false, fe = false;
