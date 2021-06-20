@@ -48,4 +48,14 @@ public class RegisterFile {
     public void setPCValue(int piValue) {
         aRegRegisters[PC].setValue(piValue);
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder(
+                "++++++++++++++++++++++++++++++++++REGISTER FILE++++++++++++++++++++++++++++++++++\n");
+        for (Register r : aRegRegisters) {
+            sb.append(r.toString()).append("\n");
+        }
+        return sb.toString();
+    }
 }

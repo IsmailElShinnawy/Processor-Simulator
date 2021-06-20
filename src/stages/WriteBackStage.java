@@ -13,6 +13,9 @@ public class WriteBackStage extends Stage {
 
     @Override
     public void execute() throws RegisterNotFoundException, ZeroRegisterException, pcSetException {
+        System.out.printf("WRITE BACK STAGE FOR INSTRUCTION 0b%s\n",
+                convertToBin32(this.getPrevPipelineRegisterFile().get("ir").getValue()));
+
         if (this.getPrevPipelineRegisterFile().get("wb").getValue() == 1) {
             int writeBackRegisterAddress = this.getPrevPipelineRegisterFile().get("wbReg").getValue();
             int dataToBeWritten = 0;
@@ -22,8 +25,10 @@ public class WriteBackStage extends Stage {
                 dataToBeWritten = this.getPrevPipelineRegisterFile().get("ac").getValue();
             }
             this.getSimulator().getRegisterFile().setRegisterValue(writeBackRegisterAddress, dataToBeWritten);
+            System.out.printf("DESTINATION_REGISTER = %d  DATA = %d\n", writeBackRegisterAddress, dataToBeWritten);
+            System.out.printf("REGISTER R%d UPDATED TO %d\n", writeBackRegisterAddress, dataToBeWritten);
         } else {
-            return;
+            System.out.println("NO WRITE BACK NEEDED");
         }
 
     }

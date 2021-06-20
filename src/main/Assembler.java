@@ -166,12 +166,13 @@ public class Assembler {
                 }
             }
             // just for debugging
-            System.out.println(convertToBinary32(mcode));
+            // System.out.println(convertToBinary32(mcode));
 
             // sets the memory address at iCount to the mcode calculated
             simSimulator.getMemory().setWord(iCount++, mcode);
         }
         System.out.println("FILE ASSEMBLED");
+        simSimulator.setTotalClkCycles(iCount);
     }
 
     private void normalize() {

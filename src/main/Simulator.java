@@ -38,17 +38,21 @@ public class Simulator {
     public Simulator(int piInstructionMemorySize, int piDataMemorySize) {
         // Initialising Memory
         memMemory = new Memory(piInstructionMemorySize + piDataMemorySize);
+        rfileRegFile = new RegisterFile();
+
         // Initialising Stages
         ifStage = new InstructionFetchStage(this);
         idStage = new InstructionDecodeStage(this);
         iexStage = new InstructionExecuteStage(this);
         maStage = new MemoryAccessStage(this);
         wbStage = new WriteBackStage(this);
+
         // Initalising Pipeline Register files
         IFtoIDPipelineRegisterFile = new PipelineRegisterFile();
         IDtoIEXPipelineRegisterFile = new PipelineRegisterFile();
         IEXtoMAPipelineRegisterFile = new PipelineRegisterFile();
         MAtoWBPipelineRegisterFile = new PipelineRegisterFile();
+
         // Connections
         ifStage.setPrevPipelineRegisterFile(null);
         ifStage.setNextPipelineRegisterFile(IFtoIDPipelineRegisterFile);
@@ -59,7 +63,7 @@ public class Simulator {
         iexStage.setPrevPipelineRegisterFile(IDtoIEXPipelineRegisterFile);
         iexStage.setNextPipelineRegisterFile(IEXtoMAPipelineRegisterFile);
 
-        maStage.setNextPipelineRegisterFile(IEXtoMAPipelineRegisterFile);
+        maStage.setPrevPipelineRegisterFile(IEXtoMAPipelineRegisterFile);
         maStage.setNextPipelineRegisterFile(MAtoWBPipelineRegisterFile);
 
         wbStage.setPrevPipelineRegisterFile(MAtoWBPipelineRegisterFile);
@@ -72,28 +76,31 @@ public class Simulator {
         int currentClkCycle = 1;
         boolean fd = false, fe = false;
         while (currentClkCycle <= iTotalClkCycles) {
-            if (currentClkCycle % 2 != 0)
-                ifStage.execute();
+            System.out.printf("CURRENT CLK CYCLE %d\n", currentClkCycle);
+            if (currentClkCycle > 6 && currentClkCycle % 2 != 0) {
+                wbStage.execute();
+            }
+            if (currentClkCycle > 5 && currentClkCycle % 2 == 0) {
+                maStage.execute();
+            }
+            if (currentClkCycle > 3) {
+                if (!fe) {
+                    iexStage.execute();
+                }
+                fe = !fe;
+            }
             if (currentClkCycle > 1) {
                 if (!fd) {
                     idStage.execute();
                 }
                 fd = !fd;
             }
-            if (currentClkCycle > 3) {
-                if (!fe) {
-                    ifStage.execute();
-                }
-                fd = !fe;
-            }
-            if (currentClkCycle > 5 && currentClkCycle % 2 == 0) {
-                maStage.execute();
-            }
-            if (currentClkCycle > 6 && currentClkCycle % 2 != 0) {
-                wbStage.execute();
-            }
+            if (currentClkCycle % 2 != 0)
+                ifStage.execute();
             ++currentClkCycle;
+            System.out.println(this.getRegisterFile());
         }
+        // System.out.println(memMemory);
     }
 
     public RegisterFile getRegisterFile() {

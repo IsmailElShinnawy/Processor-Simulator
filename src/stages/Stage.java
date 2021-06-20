@@ -40,4 +40,12 @@ public abstract class Stage {
     public PipelineRegisterFile getNextPipelineRegisterFile() {
         return nextPipelineRegisterFile;
     }
+
+    public static String convertToBin32(int x) {
+        String bin = "";
+        for (int i = 0; i < 32; ++i) {
+            bin = (((x >> i) & 1) == 1 ? '1' : '0') + bin;
+        }
+        return bin;
+    }
 }

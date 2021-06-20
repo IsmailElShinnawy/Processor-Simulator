@@ -24,4 +24,8 @@ public class Register {
     public void setName(String pStrName) {
         strName = pStrName;
     }
+
+    public String toString() {
+        return strName + " = " + iValue;
+    }
 }
