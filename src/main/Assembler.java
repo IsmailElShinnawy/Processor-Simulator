@@ -16,6 +16,8 @@ public class Assembler {
     private Hashtable<String, Integer> htblRegisterNameNumber;
     private Scanner aFileScanner;
 
+    private static final int IMMEDIATE_MASK = 0x0003FFFF;
+
     /**
      * Constructor for the assembler
      * 
@@ -149,7 +151,7 @@ public class Assembler {
                     mcode |= (opcode << 28); // add OPCODE
                     mcode |= (field1 << 23); // add R1
                     mcode |= (field2 << 18); // add R2
-                    mcode |= field3; // add IMM
+                    mcode |= (IMMEDIATE_MASK & field3); // add IMM
 
                     break;
                 }

@@ -13,6 +13,12 @@ public class WriteBackStage extends Stage {
 
     @Override
     public void execute() throws RegisterNotFoundException, ZeroRegisterException, pcSetException {
+        System.out.println("WRITE BACK STAGE");
+
+        if (getPrevPipelineRegisterFile().get("NOP").getValue() == 1) {
+            System.out.println("NO OPERATION");
+            return;
+        }
         System.out.printf("WRITE BACK STAGE FOR INSTRUCTION 0b%s\n",
                 convertToBin32(this.getPrevPipelineRegisterFile().get("ir").getValue()));
 
@@ -30,6 +36,7 @@ public class WriteBackStage extends Stage {
         } else {
             System.out.println("NO WRITE BACK NEEDED");
         }
+        System.out.println("----------------------------------------------------------");
 
     }
 

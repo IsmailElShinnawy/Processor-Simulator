@@ -1,4 +1,3 @@
-
 package stages;
 
 import exceptions.RegisterNotFoundException;
@@ -6,12 +5,20 @@ import main.Simulator;
 
 public class InstructionExecuteStage extends Stage {
 
+	private int flushSimulator;
+
 	public InstructionExecuteStage(Simulator pSimSimulator) {
 		super(pSimSimulator);
 	}
 
 	@Override
 	public void execute() throws RegisterNotFoundException {
+		System.out.println("EXECUTION STAGE");
+		if (getPrevPipelineRegisterFile().get("NOP").getValue() == 1) {
+			System.out.println("NO OPERATION");
+			// getNextPipelineRegisterFile().put("NOP", 1);
+			return;
+		}
 		System.out.printf("EXECUTING INSTRUCTION 0b%s\n",
 				convertToBin32(this.getPrevPipelineRegisterFile().get("ir").getValue()));
 
@@ -25,9 +32,6 @@ public class InstructionExecuteStage extends Stage {
 		int rd = this.getPrevPipelineRegisterFile().get("r1").getValue();
 
 		int ac = 0;
-		int jFirstParameter = (this.getSimulator().getRegisterFile().getPCValue() & 0b11110000000000000000000000000000);
-		// int jSecondParameter=address;
-		int jump = jFirstParameter | address;
 		int memoryRead = 0;
 		int memoryWrite = 0;
 		int wbReg = 0;
@@ -39,7 +43,6 @@ public class InstructionExecuteStage extends Stage {
 				System.out.printf("R2_VALUE = %d  R3_VALUE = %d\n", r2Value, r3Value);
 				ac = r2Value + r3Value;
 				System.out.println("OUTPUT = " + ac);
-				// this.getNextPipelineRegisterFile().put("wbReg", rd);
 				wbReg = rd;
 				break; // Add (R)
 			case 1:
@@ -55,7 +58,6 @@ public class InstructionExecuteStage extends Stage {
 				System.out.printf("R2_VALUE = %d  IMM = %d\n", r2Value, imm);
 				ac = r2Value * imm;
 				System.out.println("OUTPUT = " + ac);
-				// this.getNextPipelineRegisterFile().put("wbReg", rd);
 				wbReg = rd;
 				break; // Multiply immediate (I)
 			case 3:
@@ -63,7 +65,6 @@ public class InstructionExecuteStage extends Stage {
 				System.out.printf("R2_VALUE = %d  IMM = %d\n", r2Value, imm);
 				ac = r2Value + imm;
 				System.out.println("OUTPUT = " + ac);
-				// this.getNextPipelineRegisterFile().put("wbReg", rd);
 				wbReg = rd;
 				break; // Add immediate (I)
 			case 4:
@@ -73,14 +74,15 @@ public class InstructionExecuteStage extends Stage {
 					this.getSimulator().getRegisterFile()
 							.setPCValue(this.getSimulator().getRegisterFile().getPCValue() + imm);
 					System.out.printf("JUMPED TO @ %d\n", this.getSimulator().getRegisterFile().getPCValue());
+					flushSimulator = 1;
 				}
 				wb = 0;
+				break;
 			case 5:
 				System.out.println("ANDI");
 				System.out.printf("R2_VALUE = %d  IMM = %d\n", r2Value, imm);
 				ac = r2Value & imm;
 				System.out.println("OUTPUT = " + ac);
-				// this.getNextPipelineRegisterFile().put("wbReg", rd);
 				wbReg = rd;
 				break; // And Immediate
 			case 6:
@@ -88,19 +90,20 @@ public class InstructionExecuteStage extends Stage {
 				System.out.printf("R2_VALUE = %d  IMM = %d\n", r2Value, imm);
 				ac = r2Value | imm;
 				System.out.println("OUTPUT = " + ac);
-				// this.getNextPipelineRegisterFile().put("wbReg", rd);
 				wbReg = rd;
 				break;// Or Immediate
 			case 7:
+				int jump = (this.getSimulator().getRegisterFile().getPCValue() & 0xF0000000) | address;
 				System.out.printf("JUMPING TO @ %d\n", jump);
 				this.getSimulator().getRegisterFile().setPCValue(jump); // Jump
 				wb = 0;
+				flushSimulator = 1;
+				break;
 			case 8:
 				System.out.println("SLL");
 				System.out.printf("R2_VALUE = %d  SHAMT = %d\n", r2Value, shamt);
 				ac = r2Value << shamt;
 				System.out.println("OUTPUT = " + ac);
-				// this.getNextPipelineRegisterFile().put("wbReg", rd);
 				wbReg = rd;
 				break; // shift left logical
 			case 9:
@@ -108,7 +111,6 @@ public class InstructionExecuteStage extends Stage {
 				System.out.printf("R2_VALUE = %d  SHAMT = %d\n", r2Value, shamt);
 				ac = r2Value >>> shamt;
 				System.out.println("OUTPUT = " + ac);
-				// this.getNextPipelineRegisterFile().put("wbReg", rd);
 				wbReg = rd;
 				break; // shift right logical
 			case 10:
@@ -117,7 +119,6 @@ public class InstructionExecuteStage extends Stage {
 				ac = r2Value + imm;
 				memoryRead = 1;
 				System.out.println("MEMORY ADDRESS = " + ac);
-				// this.getNextPipelineRegisterFile().put("MAR", ac);
 				mar = ac;
 				break; // Memory Read
 			case 11:
@@ -125,26 +126,47 @@ public class InstructionExecuteStage extends Stage {
 				System.out.printf("R2_VALUE (base) = %d  IMM (offset) = %d R1_VALUE = %d\n", r2Value, imm, r1Value);
 				ac = r1Value;
 				memoryWrite = 1;
-				// this.getNextPipelineRegisterFile().put("MAR", rd);
 				mar = r2Value + imm;
 				wb = 0;
 				break; // Memory Write
 		}
-		this.getNextPipelineRegisterFile().put("ac", ac);
-		this.getNextPipelineRegisterFile().put("MAR", mar);
-		this.getNextPipelineRegisterFile().put("memoryRead", memoryRead);
-		this.getNextPipelineRegisterFile().put("memoryWrite", memoryWrite);
-		this.getNextPipelineRegisterFile().put("wbReg", wbReg);
-		this.getNextPipelineRegisterFile().put("wb", wb);
-		this.getNextPipelineRegisterFile().put("ir", this.getPrevPipelineRegisterFile().get("ir").getValue());
 
+		getNextPipelineRegisterFile().put("ac", ac);
+		getNextPipelineRegisterFile().put("MAR", mar);
+		getNextPipelineRegisterFile().put("memoryRead", memoryRead);
+		getNextPipelineRegisterFile().put("memoryWrite", memoryWrite);
+		getNextPipelineRegisterFile().put("wbReg", wbReg);
+		getNextPipelineRegisterFile().put("wb", wb);
+		// getNextPipelineRegisterFile().put("NOP", 0);
+
+		System.out.println("----------------------------------------------------------");
+
+	}
+
+	public void sendToNextStage() throws RegisterNotFoundException {
+		System.out.println("EXECUTION STAGE");
+		if (getPrevPipelineRegisterFile().get("NOP").getValue() == 1) {
+			System.out.println("NO OPERATION");
+			getNextPipelineRegisterFile().put("NOP", 1);
+			return;
+		}
+		getNextPipelineRegisterFile().put("NOP", 0);
+		getNextPipelineRegisterFile().put("ir", this.getPrevPipelineRegisterFile().get("ir").getValue());
+		System.out.printf("EXECUTING INSTRUCTION 0b%s\n",
+				convertToBin32(this.getPrevPipelineRegisterFile().get("ir").getValue()));
 		System.out.println("SENT TO NEXT STAGE:");
-		System.out.println("AC = " + ac);
-		System.out.println("MAR = " + mar);
-		System.out.println("MEMORY_READ = " + memoryRead);
-		System.out.println("MEMORY_WRITE = " + memoryWrite);
-		System.out.println("WB = " + wb);
-		System.out.println("WB_REG = " + wbReg);
+		System.out.println("AC = " + getNextPipelineRegisterFile().get("ac").getValue());
+		System.out.println("MAR = " + getNextPipelineRegisterFile().get("MAR").getValue());
+		System.out.println("MEMORY_READ = " + getNextPipelineRegisterFile().get("memoryRead").getValue());
+		System.out.println("MEMORY_WRITE = " + getNextPipelineRegisterFile().get("memoryWrite").getValue());
+		System.out.println("WB = " + getNextPipelineRegisterFile().get("wb").getValue());
+		System.out.println("WB_REG = " + getNextPipelineRegisterFile().get("wbReg").getValue());
+		System.out.println("----------------------------------------------------------");
+
+		if (flushSimulator == 1) {
+			getSimulator().flush();
+			flushSimulator = 0;
+		}
 
 	}
 }

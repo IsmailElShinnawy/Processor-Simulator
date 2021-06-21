@@ -6,8 +6,9 @@ import main.Simulator;
 
 public class InstructionDecodeStage extends Stage {
 
-	static final int OPCODE_MASK = 0xF0000000, R1_MASK = 0x0F800000, R2_MASK = 0x007C0000, R3_MASK = 0x0003E000,
-			SHAMT_MASK = 0x00001FFF, IMM_MASK = 0x0002FFFF, ADDRESS_MASK = 0x0FFFFFFF;
+	private static final int OPCODE_MASK = 0xF0000000, R1_MASK = 0x0F800000, R2_MASK = 0x007C0000, R3_MASK = 0x0003E000,
+			SHAMT_MASK = 0x00001FFF, IMM_MASK = 0x0002FFFF, NEG_IMM_MASK = 0xFFFFC000, ADDRESS_MASK = 0x0FFFFFFF;
+	private int nop;
 
 	public InstructionDecodeStage(Simulator pSimSimulator) {
 		super(pSimSimulator);
@@ -15,6 +16,15 @@ public class InstructionDecodeStage extends Stage {
 
 	@Override
 	public void execute() throws RegisterNotFoundException, pcGetException {
+		System.out.println("DECODING STAGE");
+		// System.out.println(nop + " " +
+		// getPrevPipelineRegisterFile().get("NOP").getValue());
+		if (nop == 1 || getPrevPipelineRegisterFile().get("NOP").getValue() == 1) {
+			System.out.println("NO OPERATION");
+			// nop = 0;
+			// getNextPipelineRegisterFile().put("NOP", 1);
+			return;
+		}
 		// getting instruction from the prev pipleline register file
 		int instruction = getPrevPipelineRegisterFile().get("ir").getValue();
 		System.out.printf("DECODING INSTRUCTION 0b%s\n", convertToBin32(instruction));
@@ -26,6 +36,9 @@ public class InstructionDecodeStage extends Stage {
 		int r3 = (instruction & R3_MASK) >> 13; // 5 bits 17-13
 		int shamt = instruction & SHAMT_MASK; // 13 bits 12-0
 		int imm = instruction & IMM_MASK; // 18 bits 17-0
+		if (((imm >> 17) & 1) == 1) { // if immediate is negative then sign extend
+			imm |= NEG_IMM_MASK;
+		}
 		int address = instruction & ADDRESS_MASK; // 28 bits 27-0
 
 		// getting operands from the register file
@@ -34,16 +47,17 @@ public class InstructionDecodeStage extends Stage {
 		int r3Value = getSimulator().getRegisterFile().getRegisterValue(r3);
 
 		// populating the next pipeline register file
-		this.getNextPipelineRegisterFile().put("opcode", opcode);
-		this.getNextPipelineRegisterFile().put("r1", r1);
-		this.getNextPipelineRegisterFile().put("r2", r2);
-		this.getNextPipelineRegisterFile().put("r3", r3);
-		this.getNextPipelineRegisterFile().put("shamt", shamt);
-		this.getNextPipelineRegisterFile().put("imm", imm);
-		this.getNextPipelineRegisterFile().put("address", address);
-		this.getNextPipelineRegisterFile().put("r1Value", r1Value);
-		this.getNextPipelineRegisterFile().put("r2Value", r2Value);
-		this.getNextPipelineRegisterFile().put("r3Value", r3Value);
+		getNextPipelineRegisterFile().put("opcode", opcode);
+		getNextPipelineRegisterFile().put("r1", r1);
+		getNextPipelineRegisterFile().put("r2", r2);
+		getNextPipelineRegisterFile().put("r3", r3);
+		getNextPipelineRegisterFile().put("shamt", shamt);
+		getNextPipelineRegisterFile().put("imm", imm);
+		getNextPipelineRegisterFile().put("address", address);
+		getNextPipelineRegisterFile().put("r1Value", r1Value);
+		getNextPipelineRegisterFile().put("r2Value", r2Value);
+		getNextPipelineRegisterFile().put("r3Value", r3Value);
+		// getNextPipelineRegisterFile().put("NOP", 0);
 
 		System.out.println("DECODING OUTPUT:");
 		System.out.println("OPCODE: " + opcode);
@@ -54,14 +68,33 @@ public class InstructionDecodeStage extends Stage {
 		System.out.println("IMM: " + imm);
 		System.out.println("ADDRESS: " + address);
 
+		System.out.println("----------------------------------------------------------");
+
+	}
+
+	public void incrementPC() throws RegisterNotFoundException {
+		System.out.println("DECODING STAGE");
+		if (nop == 1 || getPrevPipelineRegisterFile().get("NOP").getValue() == 1) {
+			System.out.println("NO OPERATION");
+			nop = 0;
+			getNextPipelineRegisterFile().put("NOP", 1);
+			return;
+		}
+		System.out.printf("DECODING INSTRUCTION 0b%s\n",
+				convertToBin32(getPrevPipelineRegisterFile().get("ir").getValue()));
+
 		// incrementing the PC by one
 		getSimulator().getRegisterFile().setPCValue(getSimulator().getRegisterFile().getPCValue() + 1);
+		getNextPipelineRegisterFile().put("pc", getSimulator().getRegisterFile().getPCValue());
+		getNextPipelineRegisterFile().put("ir", getPrevPipelineRegisterFile().get("ir").getValue());
+		getNextPipelineRegisterFile().put("NOP", 0);
 
-		System.out.println("\nINCREMENTING PC VALUE TO " + getSimulator().getRegisterFile().getPCValue());
-		System.out.println("--------------------------------------------------");
+		System.out.println("INCREMENTING PC VALUE TO " + getSimulator().getRegisterFile().getPCValue());
+		System.out.println("----------------------------------------------------------");
+	}
 
-		this.getNextPipelineRegisterFile().put("pc", getSimulator().getRegisterFile().getPCValue());
-		this.getNextPipelineRegisterFile().put("ir", this.getPrevPipelineRegisterFile().get("ir").getValue());
+	public void setNOP(int nop) {
+		this.nop = nop;
 	}
 
 }

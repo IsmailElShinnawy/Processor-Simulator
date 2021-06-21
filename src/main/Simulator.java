@@ -77,21 +77,22 @@ public class Simulator {
         boolean fd = false, fe = false;
         while (currentClkCycle <= iTotalClkCycles) {
             System.out.printf("CURRENT CLK CYCLE %d\n", currentClkCycle);
-            if (currentClkCycle > 6 && currentClkCycle % 2 != 0) {
+            if (currentClkCycle > 6 && currentClkCycle % 2 != 0)
                 wbStage.execute();
-            }
-            if (currentClkCycle > 5 && currentClkCycle % 2 == 0) {
+            if (currentClkCycle > 5 && currentClkCycle % 2 == 0)
                 maStage.execute();
-            }
             if (currentClkCycle > 3) {
-                if (!fe) {
+                if (!fe)
                     iexStage.execute();
-                }
+                else
+                    iexStage.sendToNextStage();
                 fe = !fe;
             }
             if (currentClkCycle > 1) {
-                if (!fd) {
+                if (!fd)
                     idStage.execute();
+                else {
+                    idStage.incrementPC();
                 }
                 fd = !fd;
             }
@@ -101,6 +102,11 @@ public class Simulator {
             System.out.println(this.getRegisterFile());
         }
         // System.out.println(memMemory);
+    }
+
+    public void flush() {
+        ifStage.setNOP(1);
+        idStage.setNOP(1);
     }
 
     public RegisterFile getRegisterFile() {

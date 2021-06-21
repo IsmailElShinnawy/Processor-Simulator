@@ -13,6 +13,12 @@ public class MemoryAccessStage extends Stage {
 
     @Override
     public void execute() throws RegisterNotFoundException, MemoryWriteException, MemoryReadException {
+        System.out.println("MEMORY ACCESS STAGE");
+        if (getPrevPipelineRegisterFile().get("NOP").getValue() == 1) {
+            System.out.println("NO OPERATION");
+            getNextPipelineRegisterFile().put("NOP", 1);
+            return;
+        }
         System.out.printf("MEMORY ACCESS FOR INSTRUCTION 0b%s\n",
                 convertToBin32(this.getPrevPipelineRegisterFile().get("ir").getValue()));
 
@@ -41,6 +47,7 @@ public class MemoryAccessStage extends Stage {
         this.getNextPipelineRegisterFile().put("wbReg", this.getPrevPipelineRegisterFile().get("wbReg").getValue());
         this.getNextPipelineRegisterFile().put("wb", this.getPrevPipelineRegisterFile().get("wb").getValue());
         this.getNextPipelineRegisterFile().put("ir", this.getPrevPipelineRegisterFile().get("ir").getValue());
+        getNextPipelineRegisterFile().put("NOP", 0);
 
         System.out.println("OUTPUT TO NEXT STAGE:");
         System.out.println("AC = " + ac);
@@ -48,6 +55,8 @@ public class MemoryAccessStage extends Stage {
         System.out.println("MemToReg = " + MemToReg);
         System.out.println("wbReg = " + this.getPrevPipelineRegisterFile().get("wbReg").getValue());
         System.out.println("wb = " + this.getPrevPipelineRegisterFile().get("wb").getValue());
+
+        System.out.println("----------------------------------------------------------");
 
     }
 
