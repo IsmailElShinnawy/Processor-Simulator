@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.Hashtable;
 
 import exceptions.AssemblerException;
-import exceptions.MemoryWriteException;
+import exceptions.MemoryException;
 import util.Scanner;
 
 public class Assembler {
@@ -82,7 +82,7 @@ public class Assembler {
      *                              registers
      * @throws MemoryWriteException
      */
-    public void assemble() throws IOException, AssemblerException, MemoryWriteException {
+    public void assemble() throws IOException, AssemblerException, MemoryException {
         System.out.println("ASSEMBLING FILE...");
         // counter used to keep track of the instructions number and used in memory
         // addressing
@@ -173,8 +173,8 @@ public class Assembler {
             // sets the memory address at iCount to the mcode calculated
             simSimulator.getMemory().setWord(iCount++, mcode);
         }
+        simSimulator.getMemory().setWord(iCount, 0xFFFFFFFF);
         System.out.println("FILE ASSEMBLED");
-        simSimulator.setTotalClkCycles(iCount);
     }
 
     private void normalize() {
@@ -194,11 +194,6 @@ public class Assembler {
             res = (((x >> i) & 1) == 1 ? 1 : 0) + res;
         }
         return res;
-    }
-
-    public static void main(String[] args) throws IOException, AssemblerException, MemoryWriteException {
-        Assembler a = new Assembler("src/program", null);
-        a.assemble();
     }
 
 }

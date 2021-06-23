@@ -1,8 +1,7 @@
 package stages;
 
-import exceptions.MemoryReadException;
-import exceptions.MemoryWriteException;
-import exceptions.RegisterNotFoundException;
+import exceptions.MemoryException;
+import exceptions.RegisterFileException;
 import main.Simulator;
 
 public class MemoryAccessStage extends Stage {
@@ -12,10 +11,12 @@ public class MemoryAccessStage extends Stage {
     }
 
     @Override
-    public void execute() throws RegisterNotFoundException, MemoryWriteException, MemoryReadException {
+    public void execute() throws RegisterFileException, MemoryException {
         System.out.println("MEMORY ACCESS STAGE");
+        // if a NOP is propagated from a previous stage, then do not execute anything
         if (getPrevPipelineRegisterFile().get("NOP").getValue() == 1) {
             System.out.println("NO OPERATION");
+            // propagate forward the NOP signal
             getNextPipelineRegisterFile().put("NOP", 1);
             return;
         }
@@ -28,6 +29,7 @@ public class MemoryAccessStage extends Stage {
         int memWrite = this.getPrevPipelineRegisterFile().get("memoryWrite").getValue();
         int MemToReg = 0;
         int MBR = 0;
+
         if (memWrite == 1) {
             System.out.println("MEMORY WRITE");
             System.out.printf("SET MEMORY WORD @ %d to %d\n", MAR, ac);
@@ -46,7 +48,11 @@ public class MemoryAccessStage extends Stage {
         this.getNextPipelineRegisterFile().put("MemToReg", MemToReg);
         this.getNextPipelineRegisterFile().put("wbReg", this.getPrevPipelineRegisterFile().get("wbReg").getValue());
         this.getNextPipelineRegisterFile().put("wb", this.getPrevPipelineRegisterFile().get("wb").getValue());
+
+        // propagate forward the IR value
         this.getNextPipelineRegisterFile().put("ir", this.getPrevPipelineRegisterFile().get("ir").getValue());
+
+        // propagate forward the NOP signal
         getNextPipelineRegisterFile().put("NOP", 0);
 
         System.out.println("OUTPUT TO NEXT STAGE:");

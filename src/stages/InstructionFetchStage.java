@@ -1,7 +1,6 @@
 package stages;
 
-import exceptions.MemoryReadException;
-import exceptions.RegisterNotFoundException;
+import exceptions.MemoryException;
 import main.Simulator;
 
 public class InstructionFetchStage extends Stage {
@@ -13,12 +12,15 @@ public class InstructionFetchStage extends Stage {
     }
 
     @Override
-    public void execute() throws MemoryReadException {
+    public void execute() throws MemoryException {
         System.out.println("FETCHING STAGE");
+        // if NOP signal is up, then do not execute anything
         if (nop == 1) {
             System.out.println("NO OPERATION");
-            getNextPipelineRegisterFile().put("NOP", 1);
+            // clears the current NOP signal
             nop = 0;
+            // propagate forward the NOP signal
+            getNextPipelineRegisterFile().put("NOP", 1);
             return;
         }
         System.out.printf("FETCHING INSTRUCTION FROM @ %d\n", getSimulator().getRegisterFile().getPCValue());
@@ -29,7 +31,9 @@ public class InstructionFetchStage extends Stage {
         System.out.println("----------------------------------------------------------");
 
         getNextPipelineRegisterFile().put("pc", getSimulator().getRegisterFile().getPCValue());
+        // propagate forward the ir value
         getNextPipelineRegisterFile().put("ir", instruction);
+        // propagate forward the NOP signal
         getNextPipelineRegisterFile().put("NOP", 0);
 
     }

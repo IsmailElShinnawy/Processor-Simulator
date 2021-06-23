@@ -1,9 +1,6 @@
 package storage;
 
-import exceptions.RegisterNotFoundException;
-import exceptions.ZeroRegisterException;
-import exceptions.pcGetException;
-import exceptions.pcSetException;
+import exceptions.RegisterFileException;
 
 public class RegisterFile {
     private Register aRegRegisters[];
@@ -18,27 +15,20 @@ public class RegisterFile {
         aRegRegisters[PC] = new Register("PC");
     }
 
-    public int getRegisterValue(int piRegisterAddress) throws RegisterNotFoundException, pcGetException {
-        if (piRegisterAddress >= 0 && piRegisterAddress < 32) {
-            return aRegRegisters[piRegisterAddress].getValue();
-        } else if (piRegisterAddress == 32) {
-            throw new pcGetException("Incorrect method to get PC value, please us .getPC() method");
-        } else {
-            throw new RegisterNotFoundException("You're trying to access a register that does not exist");
+    public int getRegisterValue(int piRegisterAddress) throws RegisterFileException {
+        if (piRegisterAddress < 0 || piRegisterAddress >= 32) {
+            throw new RegisterFileException(String.format("Register @ %d is not a GPR", piRegisterAddress));
         }
+        return aRegRegisters[piRegisterAddress].getValue();
     }
 
-    public void setRegisterValue(int piRegisterAddress, int piValue)
-            throws RegisterNotFoundException, ZeroRegisterException, pcSetException { // To set GPRS and Zero Reg
-        if (piRegisterAddress >= 1 && piRegisterAddress < 32) {
-            aRegRegisters[piRegisterAddress].setValue(piValue);
-        } else if (piRegisterAddress == 32) {
-            throw new pcSetException("Incorrect method to get PC value, please us .setPC() method");
-        } else if (piRegisterAddress == 0) {
-            throw new ZeroRegisterException("Can not set the value of zero register");
-        } else {
-            throw new RegisterNotFoundException("You're trying to set the value of a register that does not exist");
+    public void setRegisterValue(int piRegisterAddress, int piValue) throws RegisterFileException {
+        if (piRegisterAddress < 0 || piRegisterAddress >= 32) {
+            throw new RegisterFileException(String.format("Register @ %d is not a GPR", piRegisterAddress));
         }
+        if (piRegisterAddress == 0)
+            return;
+        aRegRegisters[piRegisterAddress].setValue(piValue);
     }
 
     public int getPCValue() {

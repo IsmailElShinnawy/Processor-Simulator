@@ -3,12 +3,8 @@ package main;
 import java.io.IOException;
 
 import exceptions.AssemblerException;
-import exceptions.MemoryReadException;
-import exceptions.MemoryWriteException;
-import exceptions.RegisterNotFoundException;
-import exceptions.ZeroRegisterException;
-import exceptions.pcGetException;
-import exceptions.pcSetException;
+import exceptions.MemoryException;
+import exceptions.RegisterFileException;
 
 public class Controller {
 
@@ -17,8 +13,7 @@ public class Controller {
 
     private static final int INSTRUCTION_MEMORY_SIZE = 1024, DATA_MEMORY_SIZE = 1024;
 
-    public Controller() throws IOException, MemoryReadException, RegisterNotFoundException, pcGetException,
-            ZeroRegisterException, pcSetException, MemoryWriteException, AssemblerException {
+    public Controller() throws IOException, AssemblerException, RegisterFileException, MemoryException {
         simulator = new Simulator(INSTRUCTION_MEMORY_SIZE, DATA_MEMORY_SIZE);
         assembler = new Assembler("src/program", simulator);
 
@@ -27,8 +22,17 @@ public class Controller {
         simulator.start();
     }
 
-    public static void main(String[] args) throws IOException, MemoryReadException, RegisterNotFoundException,
-            pcGetException, ZeroRegisterException, pcSetException, MemoryWriteException, AssemblerException {
+    /**
+     * MAIN PROGRAM TO BE RUN
+     * 
+     * @param args
+     * @throws IOException
+     * @throws MemoryException
+     * @throws RegisterFileException
+     * @throws AssemblerException
+     */
+    public static void main(String[] args)
+            throws IOException, MemoryException, RegisterFileException, AssemblerException {
         new Controller();
     }
 

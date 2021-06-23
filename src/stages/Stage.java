@@ -1,11 +1,7 @@
 package stages;
 
-import exceptions.MemoryReadException;
-import exceptions.MemoryWriteException;
-import exceptions.RegisterNotFoundException;
-import exceptions.ZeroRegisterException;
-import exceptions.pcGetException;
-import exceptions.pcSetException;
+import exceptions.MemoryException;
+import exceptions.RegisterFileException;
 import main.Simulator;
 import storage.PipelineRegisterFile;
 
@@ -18,13 +14,15 @@ public abstract class Stage {
         simSimulator = pSimSimulator;
     }
 
-    public abstract void execute() throws RegisterNotFoundException, ZeroRegisterException, pcSetException,
-            pcGetException, MemoryReadException, MemoryWriteException;
+    public abstract void execute() throws RegisterFileException, MemoryException;
 
     public Simulator getSimulator() {
         return simSimulator;
     }
 
+    /*
+     * SETTERS AND GETTERS
+     */
     public void setPrevPipelineRegisterFile(PipelineRegisterFile pPrevPipelineRegisterFile) {
         prevPipelineRegisterFile = pPrevPipelineRegisterFile;
     }
@@ -41,6 +39,9 @@ public abstract class Stage {
         return nextPipelineRegisterFile;
     }
 
+    /*
+     * HELPER METHODS
+     */
     public static String convertToBin32(int x) {
         String bin = "";
         for (int i = 0; i < 32; ++i) {

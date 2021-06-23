@@ -1,8 +1,6 @@
 package stages;
 
-import exceptions.RegisterNotFoundException;
-import exceptions.ZeroRegisterException;
-import exceptions.pcSetException;
+import exceptions.RegisterFileException;
 import main.Simulator;
 
 public class WriteBackStage extends Stage {
@@ -12,9 +10,10 @@ public class WriteBackStage extends Stage {
     }
 
     @Override
-    public void execute() throws RegisterNotFoundException, ZeroRegisterException, pcSetException {
+    public void execute() throws RegisterFileException {
         System.out.println("WRITE BACK STAGE");
 
+        // if a NOP is propagated from a previous stage, then do not execute anything
         if (getPrevPipelineRegisterFile().get("NOP").getValue() == 1) {
             System.out.println("NO OPERATION");
             return;

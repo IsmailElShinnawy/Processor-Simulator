@@ -1,6 +1,6 @@
 package stages;
 
-import exceptions.RegisterNotFoundException;
+import exceptions.RegisterFileException;
 import main.Simulator;
 
 public class InstructionExecuteStage extends Stage {
@@ -12,11 +12,11 @@ public class InstructionExecuteStage extends Stage {
 	}
 
 	@Override
-	public void execute() throws RegisterNotFoundException {
+	public void execute() throws RegisterFileException {
 		System.out.println("EXECUTION STAGE");
+		// if a NOP is propagated from a previous stage, then do not execute anything
 		if (getPrevPipelineRegisterFile().get("NOP").getValue() == 1) {
 			System.out.println("NO OPERATION");
-			// getNextPipelineRegisterFile().put("NOP", 1);
 			return;
 		}
 		System.out.printf("EXECUTING INSTRUCTION 0b%s\n",
@@ -37,6 +37,7 @@ public class InstructionExecuteStage extends Stage {
 		int wbReg = 0;
 		int wb = 1;
 		int mar = 0;
+
 		switch (opcode) {
 			case 0:
 				System.out.println("ADD");
@@ -50,7 +51,6 @@ public class InstructionExecuteStage extends Stage {
 				System.out.printf("R2_VALUE = %d  R3_VALUE = %d\n", r2Value, r3Value);
 				ac = r2Value - r3Value;
 				System.out.println("OUTPUT = " + ac);
-				// this.getNextPipelineRegisterFile().put("wbReg", rd);
 				wbReg = rd;
 				break; // Subtract (R)
 			case 2:
@@ -74,6 +74,7 @@ public class InstructionExecuteStage extends Stage {
 					this.getSimulator().getRegisterFile()
 							.setPCValue(this.getSimulator().getRegisterFile().getPCValue() + imm);
 					System.out.printf("JUMPED TO @ %d\n", this.getSimulator().getRegisterFile().getPCValue());
+					// raise the flush flag
 					flushSimulator = 1;
 				}
 				wb = 0;
@@ -97,6 +98,7 @@ public class InstructionExecuteStage extends Stage {
 				System.out.printf("JUMPING TO @ %d\n", jump);
 				this.getSimulator().getRegisterFile().setPCValue(jump); // Jump
 				wb = 0;
+				// raise the flush flag
 				flushSimulator = 1;
 				break;
 			case 8:
@@ -119,6 +121,7 @@ public class InstructionExecuteStage extends Stage {
 				ac = r2Value + imm;
 				memoryRead = 1;
 				System.out.println("MEMORY ADDRESS = " + ac);
+				wbReg = rd;
 				mar = ac;
 				break; // Memory Read
 			case 11:
@@ -137,21 +140,25 @@ public class InstructionExecuteStage extends Stage {
 		getNextPipelineRegisterFile().put("memoryWrite", memoryWrite);
 		getNextPipelineRegisterFile().put("wbReg", wbReg);
 		getNextPipelineRegisterFile().put("wb", wb);
-		// getNextPipelineRegisterFile().put("NOP", 0);
 
 		System.out.println("----------------------------------------------------------");
 
 	}
 
-	public void sendToNextStage() throws RegisterNotFoundException {
+	public void sendToNextStage() throws RegisterFileException {
 		System.out.println("EXECUTION STAGE");
+		// if a NOP is propagated from a previous stage, then do not execute anything
 		if (getPrevPipelineRegisterFile().get("NOP").getValue() == 1) {
 			System.out.println("NO OPERATION");
+			// propagate the NOP signal forward
 			getNextPipelineRegisterFile().put("NOP", 1);
 			return;
 		}
+		// propagate the NOP signal forward
 		getNextPipelineRegisterFile().put("NOP", 0);
+		// propagate the ir value forward
 		getNextPipelineRegisterFile().put("ir", this.getPrevPipelineRegisterFile().get("ir").getValue());
+
 		System.out.printf("EXECUTING INSTRUCTION 0b%s\n",
 				convertToBin32(this.getPrevPipelineRegisterFile().get("ir").getValue()));
 		System.out.println("SENT TO NEXT STAGE:");
@@ -163,6 +170,7 @@ public class InstructionExecuteStage extends Stage {
 		System.out.println("WB_REG = " + getNextPipelineRegisterFile().get("wbReg").getValue());
 		System.out.println("----------------------------------------------------------");
 
+		// if BNE or J results in changing the PC value, signal the simulator
 		if (flushSimulator == 1) {
 			getSimulator().flush();
 			flushSimulator = 0;

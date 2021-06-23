@@ -1,13 +1,14 @@
 package stages;
 
-import exceptions.RegisterNotFoundException;
-import exceptions.pcGetException;
+import exceptions.RegisterFileException;
 import main.Simulator;
 
 public class InstructionDecodeStage extends Stage {
 
+	// masks to be used in decoding
 	private static final int OPCODE_MASK = 0xF0000000, R1_MASK = 0x0F800000, R2_MASK = 0x007C0000, R3_MASK = 0x0003E000,
 			SHAMT_MASK = 0x00001FFF, IMM_MASK = 0x0002FFFF, NEG_IMM_MASK = 0xFFFFC000, ADDRESS_MASK = 0x0FFFFFFF;
+	// flag to signal a NOP
 	private int nop;
 
 	public InstructionDecodeStage(Simulator pSimSimulator) {
@@ -15,14 +16,12 @@ public class InstructionDecodeStage extends Stage {
 	}
 
 	@Override
-	public void execute() throws RegisterNotFoundException, pcGetException {
+	public void execute() throws RegisterFileException {
 		System.out.println("DECODING STAGE");
-		// System.out.println(nop + " " +
-		// getPrevPipelineRegisterFile().get("NOP").getValue());
+		// if NOP signal is up or a NOP is propagated from a previous stage, then do not
+		// execute anything
 		if (nop == 1 || getPrevPipelineRegisterFile().get("NOP").getValue() == 1) {
 			System.out.println("NO OPERATION");
-			// nop = 0;
-			// getNextPipelineRegisterFile().put("NOP", 1);
 			return;
 		}
 		// getting instruction from the prev pipleline register file
@@ -57,7 +56,6 @@ public class InstructionDecodeStage extends Stage {
 		getNextPipelineRegisterFile().put("r1Value", r1Value);
 		getNextPipelineRegisterFile().put("r2Value", r2Value);
 		getNextPipelineRegisterFile().put("r3Value", r3Value);
-		// getNextPipelineRegisterFile().put("NOP", 0);
 
 		System.out.println("DECODING OUTPUT:");
 		System.out.println("OPCODE: " + opcode);
@@ -72,11 +70,15 @@ public class InstructionDecodeStage extends Stage {
 
 	}
 
-	public void incrementPC() throws RegisterNotFoundException {
+	public void incrementPC() throws RegisterFileException {
 		System.out.println("DECODING STAGE");
+		// if NOP signal is up or a NOP is propagated from a previous stage, then do not
+		// execute anything
 		if (nop == 1 || getPrevPipelineRegisterFile().get("NOP").getValue() == 1) {
 			System.out.println("NO OPERATION");
+			// clear NOP signal
 			nop = 0;
+			// propagate forward the NOP signal
 			getNextPipelineRegisterFile().put("NOP", 1);
 			return;
 		}
@@ -86,13 +88,18 @@ public class InstructionDecodeStage extends Stage {
 		// incrementing the PC by one
 		getSimulator().getRegisterFile().setPCValue(getSimulator().getRegisterFile().getPCValue() + 1);
 		getNextPipelineRegisterFile().put("pc", getSimulator().getRegisterFile().getPCValue());
+		// propagate forward the ir value
 		getNextPipelineRegisterFile().put("ir", getPrevPipelineRegisterFile().get("ir").getValue());
+		// propagate forward the NOP signal
 		getNextPipelineRegisterFile().put("NOP", 0);
 
 		System.out.println("INCREMENTING PC VALUE TO " + getSimulator().getRegisterFile().getPCValue());
 		System.out.println("----------------------------------------------------------");
 	}
 
+	/*
+	 * SETTERS
+	 */
 	public void setNOP(int nop) {
 		this.nop = nop;
 	}
