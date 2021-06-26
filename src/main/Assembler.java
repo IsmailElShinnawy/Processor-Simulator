@@ -2,6 +2,7 @@ package main;
 
 import java.io.IOException;
 import java.util.Hashtable;
+import java.util.NoSuchElementException;
 
 import exceptions.AssemblerException;
 import exceptions.MemoryException;
@@ -63,11 +64,9 @@ public class Assembler {
      */
     private void mapRegistersToNumbers() {
         for (int i = 0; i <= 32; ++i) {
+            htblRegisterNameNumber.put("$R" + i, i);
             htblRegisterNameNumber.put("R" + i, i);
         }
-    }
-
-    private void setSimulatorRegistersNames() {
     }
 
     /**
@@ -87,9 +86,18 @@ public class Assembler {
         // counter used to keep track of the instructions number and used in memory
         // addressing
         int iCount = 0;
+        int line = 0;
         while (aFileScanner.ready()) {
             // reads the operation that needs to be executed
             String ins = aFileScanner.next().toUpperCase();
+            // adds support to comments
+            line++;
+            if (ins.charAt(0) == '#') {
+                while (aFileScanner.hasMoreTokens()) {
+                    aFileScanner.dangerNext();
+                }
+                continue;
+            }
             int opcode;
             char type;
             try {
@@ -98,7 +106,7 @@ public class Assembler {
                 // consults the table to find the correct type for this operation
                 type = htblInstructionType.get(ins);
             } catch (NullPointerException npe) {
-                throw new AssemblerException(String.format("Unsupported instruction `%s` at line %d", ins, iCount + 1));
+                throw new AssemblerException(String.format("Unsupported instruction `%s` at line %d", ins, line));
             }
             // initializes the mcode with 0 which will be set later
             int mcode = 0;
@@ -107,13 +115,16 @@ public class Assembler {
                     // every R-type instruction has 3 fields other than operation
                     // R1 R2 R3 in case of all R-type except for SLL and SRL
                     // R1 R2 IMM in of SLL and SRL
-                    int field1, field2, field3;
+                    int field1, field2, field3 = 0;
                     try {
                         // gets the register addresses of the first two fields
-                        field1 = htblRegisterNameNumber.get(aFileScanner.next().toUpperCase());
-                        field2 = htblRegisterNameNumber.get(aFileScanner.next().toUpperCase());
+                        field1 = htblRegisterNameNumber.get(aFileScanner.dangerNext().toUpperCase());
+                        field2 = htblRegisterNameNumber.get(aFileScanner.dangerNext().toUpperCase());
                     } catch (NullPointerException npe) {
-                        throw new AssemblerException(String.format("Unknown register used at line %d", iCount + 1));
+                        throw new AssemblerException(String.format("Unknown register used at line %d", line));
+                    } catch (NoSuchElementException nsee) {
+                        throw new AssemblerException(
+                                String.format("Bad %s type instruction at line %d", type + "", line));
                     }
 
                     // sets the machine code field by field
@@ -124,11 +135,26 @@ public class Assembler {
                     // add R3 or SHAMT
                     if (ins.equals("SLL") || ins.equals("SRL")) {
                         // add SHAMT if SLL or SRL instruction
-                        field3 = aFileScanner.nextInt();
+                        try {
+                            field3 = aFileScanner.dangerNextInt();
+                        } catch (NumberFormatException nfe) {
+                            throw new AssemblerException(
+                                    String.format("Unsupported immediate value used at line %d", line));
+                        } catch (NoSuchElementException nsee) {
+                            throw new AssemblerException(
+                                    String.format("Bad %s type instruction at line %d", type + "", line));
+                        }
                         mcode |= field3;
                     } else {
                         // add R3 if not SLL and not SRL instruction
-                        field3 = htblRegisterNameNumber.get(aFileScanner.next().toUpperCase());
+                        try {
+                            field3 = htblRegisterNameNumber.get(aFileScanner.dangerNext().toUpperCase());
+                        } catch (NullPointerException npe) {
+                            throw new AssemblerException(String.format("Unknown register used at line %d", line));
+                        } catch (NoSuchElementException nsee) {
+                            throw new AssemblerException(
+                                    String.format("Bad %s type instruction at line %d", type + "", line));
+                        }
                         mcode |= (field3 << 13);
                     }
 
@@ -139,13 +165,24 @@ public class Assembler {
                     int field1, field2, field3;
                     try {
                         // gets the register addresses of the first two fields
-                        field1 = htblRegisterNameNumber.get(aFileScanner.next().toUpperCase());
-                        field2 = htblRegisterNameNumber.get(aFileScanner.next().toUpperCase());
+                        field1 = htblRegisterNameNumber.get(aFileScanner.dangerNext().toUpperCase());
+                        field2 = htblRegisterNameNumber.get(aFileScanner.dangerNext().toUpperCase());
                     } catch (NullPointerException npe) {
-                        throw new AssemblerException(String.format("Unknown register used at line %d", iCount + 1));
+                        throw new AssemblerException(String.format("Unknown register used at line %d", line));
+                    } catch (NoSuchElementException nsee) {
+                        throw new AssemblerException(
+                                String.format("Bad %s type instruction at line %d", type + "", line));
                     }
                     // gets the immediate value
-                    field3 = aFileScanner.nextInt();
+                    try {
+                        field3 = aFileScanner.dangerNextInt();
+                    } catch (NumberFormatException nfe) {
+                        throw new AssemblerException(
+                                String.format("Unsupported immediate value used at line %d", line));
+                    } catch (NoSuchElementException nsee) {
+                        throw new AssemblerException(
+                                String.format("Bad %s type instruction at line %d", type + "", line));
+                    }
 
                     // sets the machine code field by field
                     mcode |= (opcode << 28); // add OPCODE
@@ -158,7 +195,16 @@ public class Assembler {
                 case 'J': {
                     // every J-type instruction has 1 field other than operation
                     // gets the address
-                    int field1 = aFileScanner.nextInt();
+                    int field1 = 0;
+                    try {
+                        field1 = aFileScanner.dangerNextInt();
+                    } catch (NumberFormatException nfe) {
+                        throw new AssemblerException(
+                                String.format("Unsupported immediate value used at line %d", line));
+                    } catch (NoSuchElementException nsee) {
+                        throw new AssemblerException(
+                                String.format("Bad %s type instruction at line %d", type + "", line));
+                    }
 
                     // sets the machine code field by field
                     mcode |= (opcode << 28); // add OPCODE
@@ -170,15 +216,23 @@ public class Assembler {
             // just for debugging
             // System.out.println(convertToBinary32(mcode));
 
+            try {
+                String comment = aFileScanner.dangerNext();
+                if (comment.charAt(0) == '#') {
+                    while (aFileScanner.hasMoreTokens()) {
+                        aFileScanner.dangerNext();
+                    }
+                } else {
+                    throw new AssemblerException(String.format("Bad %s type instruction at line %d", type + "", line));
+                }
+            } catch (NoSuchElementException nsee) {
+            }
+
             // sets the memory address at iCount to the mcode calculated
             simSimulator.getMemory().setWord(iCount++, mcode);
         }
         simSimulator.getMemory().setWord(iCount, 0xFFFFFFFF);
         System.out.println("FILE ASSEMBLED");
-    }
-
-    private void normalize() {
-
     }
 
     /**

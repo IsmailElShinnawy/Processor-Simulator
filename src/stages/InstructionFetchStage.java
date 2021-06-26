@@ -42,4 +42,8 @@ public class InstructionFetchStage extends Stage {
         this.nop = nop;
     }
 
+    public int getNOP() {
+        return nop;
+    }
+
 }

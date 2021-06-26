@@ -30,6 +30,10 @@ public class Scanner {
         return st.nextToken();
     }
 
+    public String dangerNext() throws IOException {
+        return st.nextToken();
+    }
+
     public String nextLine() throws IOException {
         return br.readLine();
     }
@@ -39,12 +43,20 @@ public class Scanner {
         return Integer.parseInt(st.nextToken());
     }
 
+    public int dangerNextInt() throws IOException {
+        return Integer.parseInt(st.nextToken());
+    }
+
     public boolean ready() throws IOException {
         return br.ready();
     }
 
+    public boolean hasMoreTokens() {
+        return st.hasMoreTokens();
+    }
+
     private void checkEmptyST() throws IOException {
-        if (st == null || !st.hasMoreTokens()) {
+        while (st == null || !st.hasMoreTokens()) {
             if (seperator != null) {
                 st = new StringTokenizer(br.readLine(), seperator);
             } else {

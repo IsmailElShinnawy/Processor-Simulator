@@ -28,10 +28,9 @@ public class Memory {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder(
-                "++++++++++++++++++++++++++++++++++ MEMORY ++++++++++++++++++++++++++++++++++\n@\t\tWord\n");
+        StringBuilder sb = new StringBuilder("++++++++++++++++ MEMORY ++++++++++++++++\n");
         for (int i = 0; i < aiMem.length; ++i) {
-            sb.append(String.format("%d\t\t%d\n", i, aiMem[i]));
+            sb.append(String.format("%-15d\t\t%d\n", i, aiMem[i]));
         }
         return sb.toString();
     }

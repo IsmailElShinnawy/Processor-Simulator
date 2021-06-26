@@ -36,6 +36,7 @@ public class Simulator {
     // after "HLT" instruction is fetched then you only need to run simulation for 4
     // more cycles
     private int remainingClkCycles = 4;
+    private boolean end;
 
     /**
      * Constructor of the simulator, initializes memory, register file, instruction
@@ -91,7 +92,7 @@ public class Simulator {
     public void start() throws MemoryException, RegisterFileException, FileNotFoundException {
         System.out.println("--------------------------START OF SIMULATION--------------------------");
         iCurrentClkCycle = 1;
-        boolean fd = false, fe = false, end = false;
+        boolean fd = false, fe = false;
         while (true) {
             // checks if program ended
             if (end && remainingClkCycles-- == 0) {
@@ -118,9 +119,10 @@ public class Simulator {
                 fd = !fd;
             }
             if (iCurrentClkCycle % 2 != 0) {
+                int ifNOP = ifStage.getNOP(); // checks if fetch stage is a NOP
                 ifStage.execute();
                 // checks if instruction fetched is "HLT"
-                if (IFtoIDPipelineRegisterFile.get("ir").getValue() == 0xFFFFFFFF) {
+                if (IFtoIDPipelineRegisterFile.get("ir").getValue() == 0xFFFFFFFF && ifNOP != 1) {
                     end = true;
                     idStage.setNOP(1);
                 }
@@ -140,6 +142,9 @@ public class Simulator {
      * stages
      */
     public void flush() {
+        System.out.println("FLUSH");
+        end = false;
+        remainingClkCycles = 4;
         ifStage.setNOP(1);
         idStage.setNOP(1);
     }
