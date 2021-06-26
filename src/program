@@ -4,7 +4,7 @@ addi $r1 $r0 5      # 5
 addi $r2 $r2 1      # 1...5
 addi $r3 $r0 2      # 2
 addi $r4 $r4 1      # counter to how many times before branch is entered
-bne $r1 $r2 -4      
+bne $r1 $r2 -4      # loops until $r1 and $r2 are equal
 addi $r5 $r5 1      # counter to how many times after branch is entered
 sub $r6 $r3 $r1     # -3
 muli $r7 $r2 -5     # -25

@@ -128,8 +128,8 @@ public class Simulator {
                 }
             }
             ++iCurrentClkCycle;
-            System.out.println(getRegisterFile());
         }
+        System.out.println(getRegisterFile());
         // System.out.println(memMemory);
         PrintWriter pw = new PrintWriter(new File("src/memory"));
         pw.append(memMemory.toString());
