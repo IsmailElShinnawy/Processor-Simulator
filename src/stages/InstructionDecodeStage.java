@@ -7,7 +7,7 @@ public class InstructionDecodeStage extends Stage {
 
 	// masks to be used in decoding
 	private static final int OPCODE_MASK = 0xF0000000, R1_MASK = 0x0F800000, R2_MASK = 0x007C0000, R3_MASK = 0x0003E000,
-			SHAMT_MASK = 0x00001FFF, IMM_MASK = 0x0002FFFF, NEG_IMM_MASK = 0xFFFFC000, ADDRESS_MASK = 0x0FFFFFFF;
+			SHAMT_MASK = 0x00001FFF, IMM_MASK = 0x0002FFFF, NEG_IMM_MASK = 0xFFFC0000, ADDRESS_MASK = 0x0FFFFFFF;
 	// flag to signal a NOP
 	private int nop;
 
