@@ -7,7 +7,7 @@ public class InstructionDecodeStage extends Stage {
 
 	// masks to be used in decoding
 	private static final int OPCODE_MASK = 0xF0000000, R1_MASK = 0x0F800000, R2_MASK = 0x007C0000, R3_MASK = 0x0003E000,
-			SHAMT_MASK = 0x00001FFF, IMM_MASK = 0x0002FFFF, NEG_IMM_MASK = 0xFFFC0000, ADDRESS_MASK = 0x0FFFFFFF;
+			SHAMT_MASK = 0x00001FFF, IMM_MASK = 0x0003FFFF, NEG_IMM_MASK = 0xFFFC0000, ADDRESS_MASK = 0x0FFFFFFF;
 	// flag to signal a NOP
 	private int nop;
 
@@ -35,8 +35,10 @@ public class InstructionDecodeStage extends Stage {
 		int r3 = (instruction & R3_MASK) >> 13; // 5 bits 17-13
 		int shamt = instruction & SHAMT_MASK; // 13 bits 12-0
 		int imm = instruction & IMM_MASK; // 18 bits 17-0
+		System.out.println(convertToBin32(imm));
 		if (((imm >> 17) & 1) == 1) { // if immediate is negative then sign extend
 			imm |= NEG_IMM_MASK;
+			System.out.println(convertToBin32(imm));
 		}
 		int address = instruction & ADDRESS_MASK; // 28 bits 27-0
 
