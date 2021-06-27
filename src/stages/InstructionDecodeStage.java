@@ -35,10 +35,8 @@ public class InstructionDecodeStage extends Stage {
 		int r3 = (instruction & R3_MASK) >> 13; // 5 bits 17-13
 		int shamt = instruction & SHAMT_MASK; // 13 bits 12-0
 		int imm = instruction & IMM_MASK; // 18 bits 17-0
-		System.out.println(convertToBin32(imm));
 		if (((imm >> 17) & 1) == 1) { // if immediate is negative then sign extend
 			imm |= NEG_IMM_MASK;
-			System.out.println(convertToBin32(imm));
 		}
 		int address = instruction & ADDRESS_MASK; // 28 bits 27-0
 
